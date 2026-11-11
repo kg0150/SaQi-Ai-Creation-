@@ -81,100 +81,131 @@ class VideoProductionRepository {
 
         _projects.value = listOf(newProj) + _projects.value
         _currentProject.value = newProj
+        autoRepairAttempts = 0
         return newProj
     }
+
+    private var autoRepairAttempts = 0
+    private val maxAutoRepairAttempts = 3
 
     suspend fun runFullAgentPipeline(onStepUpdate: (String) -> Unit) {
         val current = _currentProject.value ?: return
         current.status = ProjectStatus.PROCESSING
         val logs = mutableListOf<String>()
 
-        for (agent in current.agentEvaluations) {
-            agent.status = AgentStatus.RUNNING
-            onStepUpdate("Running Agent ${agent.agentId}: ${agent.agentName}...")
-            logs.add("[AGENT ${agent.agentId}] ${agent.agentName} analyzing project constraints...")
-            _pipelineLogs.value = logs.toList()
-            delay(280)
+        try {
+            for (agent in current.agentEvaluations) {
+                agent.status = AgentStatus.RUNNING
+                onStepUpdate("Running Agent ${agent.agentId}: ${agent.agentName}...")
+                logs.add("[AGENT ${agent.agentId}] ${agent.agentName} analyzing project constraints...")
+                _pipelineLogs.value = logs.toList()
+                delay(280)
 
-            if (agent.agentId == 5) {
-                // Agent 5: Voice QA detects phonetic issue on Scene 4
-                agent.status = AgentStatus.FLAGGED
-                agent.score = 87
-                agent.detectedErrors.clear()
-                agent.detectedErrors.add("Scene 4: Pronunciation stress on '${current.mapConfig.destinationCity}' accented")
-                agent.correctionInstructions = "Apply phonetic phoneme /rɪˈjɑːd/ to Scene 4 synthesizer."
-                logs.add("⚠️ [ALERT] Voice QA Agent flagged Scene 4 pronunciation inconsistency.")
-            } else if (agent.agentId == 13) {
-                // Master QA Gatekeeper checks all previous agents
-                agent.status = AgentStatus.FLAGGED
-                agent.score = 89
-                agent.feedback = "Overall score 89/100 below 90 threshold due to Voice QA flag on Scene 4. Dispatching auto-repair."
-                logs.add("❌ [MASTER QA] Project flagged (Score 89 < 90). Auto-repair required.")
-            } else {
-                agent.status = AgentStatus.PASSED
-                logs.add("✓ [PASSED] ${agent.agentName} verified (Score: ${agent.score}/100)")
+                if (agent.agentId == 5) {
+                    // Agent 5: Voice QA detects phonetic issue on Scene 4
+                    agent.status = AgentStatus.FLAGGED
+                    agent.score = 87
+                    agent.detectedErrors.clear()
+                    agent.detectedErrors.add("Scene 4: Pronunciation stress on '${current.mapConfig.destinationCity}' accented")
+                    agent.correctionInstructions = "Apply phonetic phoneme /rɪˈjɑːd/ to Scene 4 synthesizer."
+                    logs.add("⚠️ [ALERT] Voice QA Agent flagged Scene 4 pronunciation inconsistency.")
+                } else if (agent.agentId == 13) {
+                    // Master QA Gatekeeper checks all previous agents
+                    agent.status = AgentStatus.FLAGGED
+                    agent.score = 89
+                    agent.feedback = "Overall score 89/100 below 90 threshold due to Voice QA flag on Scene 4. Dispatching auto-repair."
+                    logs.add("❌ [MASTER QA] Project flagged (Score 89 < 90). Auto-repair required.")
+                } else {
+                    agent.status = AgentStatus.PASSED
+                    logs.add("✓ [PASSED] ${agent.agentName} verified (Score: ${agent.score}/100)")
+                }
+                _pipelineLogs.value = logs.toList()
             }
-            _pipelineLogs.value = logs.toList()
-        }
 
-        current.qualityScores = QualityScores(overallQuality = 89, voiceQuality = 87)
-        current.status = ProjectStatus.NEEDS_FIX
-        _currentProject.value = current
+            current.qualityScores = QualityScores(overallQuality = 89, voiceQuality = 87)
+            current.status = ProjectStatus.NEEDS_FIX
+            _currentProject.value = current
+        } catch (e: Exception) {
+            logs.add("❌ [PIPELINE ERROR] Execution encountered unexpected state: ${e.localizedMessage ?: "Unknown error"}")
+            _pipelineLogs.value = logs.toList()
+            current.status = ProjectStatus.FAILED
+            _currentProject.value = current
+            onStepUpdate("Pipeline execution failed. Please retry.")
+        }
     }
 
     suspend fun executeAutoRepairLoop(onProgress: (String) -> Unit) {
         val current = _currentProject.value ?: return
-        current.status = ProjectStatus.AUTO_FIXING
         val logs = _pipelineLogs.value.toMutableList()
 
-        onProgress("Isolating affected asset: Scene 4 Voice-Over...")
-        logs.add("🔄 [AUTO-REPAIR] Isolating Scene 4 voiceover stem. Keeping Scenes 1, 2, 3, 5 cached.")
-        _pipelineLogs.value = logs.toList()
-        delay(400)
+        if (autoRepairAttempts >= maxAutoRepairAttempts) {
+            onProgress("Maximum auto-repair retries ($maxAutoRepairAttempts) reached. Manual review required.")
+            logs.add("⚠️ [LIMIT REACHED] Auto-repair halted after $maxAutoRepairAttempts attempts to prevent infinite retry loop.")
+            _pipelineLogs.value = logs.toList()
+            current.status = ProjectStatus.NEEDS_FIX
+            _currentProject.value = current
+            return
+        }
 
-        onProgress("Applying phonetic correction /rɪˈjɑːd/...")
-        logs.add("🔧 [PHONETICS] Applied pronunciation dictionary override: '${current.mapConfig.destinationCity}' -> /rɪˈjɑːd/")
-        _pipelineLogs.value = logs.toList()
-        delay(400)
+        autoRepairAttempts++
+        current.status = ProjectStatus.AUTO_FIXING
 
-        // Fix Scene 4
-        val scene4 = current.scenes.find { it.id == 4 }
-        scene4?.status = "Voice Re-synthesized & In-Phase"
+        try {
+            onProgress("Isolating affected asset: Scene 4 Voice-Over (Attempt $autoRepairAttempts/$maxAutoRepairAttempts)...")
+            logs.add("🔄 [AUTO-REPAIR #$autoRepairAttempts] Isolating Scene 4 voiceover stem. Keeping Scenes 1, 2, 3, 5 cached.")
+            _pipelineLogs.value = logs.toList()
+            delay(400)
 
-        onProgress("Agent 5 (Voice QA) re-evaluating Scene 4...")
-        val voiceAgent = current.agentEvaluations.find { it.agentId == 5 }
-        voiceAgent?.status = AgentStatus.APPROVED
-        voiceAgent?.score = 98
-        voiceAgent?.feedback = "Pronunciation verified natural, phonetically accurate, and synced with visual timeline."
-        voiceAgent?.detectedErrors?.clear()
-        voiceAgent?.correctionInstructions = null
-        logs.add("✓ [VOICE QA] Scene 4 re-audit PASSED. Score elevated to 98/100.")
-        _pipelineLogs.value = logs.toList()
-        delay(350)
+            onProgress("Applying phonetic correction /rɪˈjɑːd/...")
+            logs.add("🔧 [PHONETICS] Applied pronunciation dictionary override: '${current.mapConfig.destinationCity}' -> /rɪˈjɑːd/")
+            _pipelineLogs.value = logs.toList()
+            delay(400)
 
-        onProgress("Agent 13 (Master QA Gatekeeper) performing final audit...")
-        val masterAgent = current.agentEvaluations.find { it.agentId == 13 }
-        masterAgent?.status = AgentStatus.APPROVED
-        masterAgent?.score = 97
-        masterAgent?.feedback = "All 12 production modules approved. Overall quality score 97/100 exceeds 90 threshold."
-        masterAgent?.detectedErrors?.clear()
-        logs.add("🎉 [MASTER QA] FINAL APPROVAL GRANTED! Overall Quality: 97/100 (Threshold: 90).")
-        _pipelineLogs.value = logs.toList()
-        delay(300)
+            // Fix Scene 4
+            val scene4 = current.scenes.find { it.id == 4 }
+            scene4?.status = "Voice Re-synthesized & In-Phase"
 
-        current.qualityScores = QualityScores(
-            scriptQuality = 96,
-            voiceQuality = 98,
-            visualQuality = 97,
-            mapAccuracy = 99,
-            subtitleQuality = 98,
-            audioQuality = 96,
-            editingQuality = 96,
-            thumbnailQuality = 97,
-            overallQuality = 97
-        )
-        current.status = ProjectStatus.APPROVED
-        _currentProject.value = current
+            onProgress("Agent 5 (Voice QA) re-evaluating Scene 4...")
+            val voiceAgent = current.agentEvaluations.find { it.agentId == 5 }
+            voiceAgent?.status = AgentStatus.APPROVED
+            voiceAgent?.score = 98
+            voiceAgent?.feedback = "Pronunciation verified natural, phonetically accurate, and synced with visual timeline."
+            voiceAgent?.detectedErrors?.clear()
+            voiceAgent?.correctionInstructions = null
+            logs.add("✓ [VOICE QA] Scene 4 re-audit PASSED. Score elevated to 98/100.")
+            _pipelineLogs.value = logs.toList()
+            delay(350)
+
+            onProgress("Agent 13 (Master QA Gatekeeper) performing final audit...")
+            val masterAgent = current.agentEvaluations.find { it.agentId == 13 }
+            masterAgent?.status = AgentStatus.APPROVED
+            masterAgent?.score = 97
+            masterAgent?.feedback = "All 12 production modules approved. Overall quality score 97/100 exceeds 90 threshold."
+            masterAgent?.detectedErrors?.clear()
+            logs.add("🎉 [MASTER QA] FINAL APPROVAL GRANTED! Overall Quality: 97/100 (Threshold: 90).")
+            _pipelineLogs.value = logs.toList()
+            delay(300)
+
+            current.qualityScores = QualityScores(
+                scriptQuality = 96,
+                voiceQuality = 98,
+                visualQuality = 97,
+                mapAccuracy = 99,
+                subtitleQuality = 98,
+                audioQuality = 96,
+                editingQuality = 96,
+                thumbnailQuality = 97,
+                overallQuality = 97
+            )
+            current.status = ProjectStatus.APPROVED
+            _currentProject.value = current
+        } catch (e: Exception) {
+            logs.add("❌ [AUTO-REPAIR ERROR] Failed to complete auto-repair: ${e.localizedMessage ?: "Unknown error"}")
+            _pipelineLogs.value = logs.toList()
+            current.status = ProjectStatus.NEEDS_FIX
+            _currentProject.value = current
+            onProgress("Auto-repair failed. Please try again.")
+        }
     }
 
     fun regenerateSingleScene(sceneId: Int) {

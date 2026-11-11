@@ -911,8 +911,17 @@ const HTML_APP = `<!DOCTYPE html>
       document.getElementById('ratio-btn-11').className = ratio === '1:1' ? 'px-2 py-1 text-[11px] font-bold rounded bg-amber-500 text-slate-950' : 'px-2 py-1 text-[11px] font-bold rounded bg-[#1E283F] text-slate-300';
     }
 
+    let autoRepairRetries = 0;
+    const MAX_AUTO_REPAIR_RETRIES = 3;
+
     async function executeAutoRepair() {
-      showToast('Executing Automatic Error-Correction Loop on Scene 4...');
+      if (autoRepairRetries >= MAX_AUTO_REPAIR_RETRIES) {
+        showToast('⚠️ Maximum auto-repair limit (3) reached. Manual review recommended.');
+        return;
+      }
+      autoRepairRetries++;
+      showToast('Executing Automatic Error-Correction Loop on Scene 4 (Attempt ' + autoRepairRetries + '/' + MAX_AUTO_REPAIR_RETRIES + ')...');
+      
       // Surgical correction
       currentProject.qualityScores.voiceQuality = 98;
       currentProject.qualityScores.overallQuality = 97;
@@ -941,6 +950,7 @@ const HTML_APP = `<!DOCTYPE html>
     }
 
     function createNewProject() {
+      autoRepairRetries = 0;
       const p = document.getElementById('creator-prompt').value;
       const from = document.getElementById('creator-from').value;
       const to = document.getElementById('creator-to').value;

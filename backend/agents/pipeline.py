@@ -240,18 +240,30 @@ class AgentPipelineOrchestrator:
         )
         return evaluations, scores
 
+    MAX_RETRIES = 3
+
     @classmethod
-    def execute_auto_repair(cls, scenes: List[Scene], evaluations: List[AgentEvaluation]) -> Tuple[List[AgentEvaluation], QualityScores]:
+    def execute_auto_repair(cls, scenes: List[Scene], evaluations: List[AgentEvaluation], retry_count: int = 1) -> Tuple[List[AgentEvaluation], QualityScores]:
         """
         Automatic Error-Correction Loop:
         Surgically corrects only the affected asset (Scene 4 voiceover),
         re-evaluates with Agent 5 and Agent 13, and elevates scores above 90.
+        Guards against infinite retries with MAX_RETRIES limit.
         """
+        if retry_count > cls.MAX_RETRIES:
+            # Prevent infinite retry loop
+            for ev in evaluations:
+                if ev.agent_id == 13:
+                    ev.status = AgentStatus.FLAGGED
+                    ev.feedback = f"Auto-repair halted: exceeded maximum retry threshold ({cls.MAX_RETRIES}). Manual review required."
+            scores = QualityScores(overall_quality=88)
+            return evaluations, scores
+
         # Surgical fix on Scene 4
         for sc in scenes:
             if sc.id == 4:
                 sc.narration = "Descending into Riyadh, where rich historical heritage meets visionary futuristic architecture."
-                sc.status = "Voice Corrected & Synced"
+                sc.status = f"Voice Corrected & Synced (Attempt {retry_count}/{cls.MAX_RETRIES})"
 
         # Update Agent 5 (Voice QA) to Approved
         for ev in evaluations:
@@ -264,7 +276,7 @@ class AgentPipelineOrchestrator:
             elif ev.agent_id == 13:
                 ev.status = AgentStatus.APPROVED
                 ev.score = 97
-                ev.feedback = "All 12 domains approved. Overall quality score is 97/100 (exceeds 90 threshold). Final video verified."
+                ev.feedback = f"All 12 domains approved on attempt {retry_count}. Overall quality score is 97/100 (exceeds 90 threshold). Final video verified."
                 ev.detected_errors = []
                 ev.correction_instructions = None
 
@@ -280,3 +292,4 @@ class AgentPipelineOrchestrator:
             overall_quality=97
         )
         return evaluations, new_scores
+
