@@ -1,0 +1,13 @@
+{
+  "name": "cinecraft-ai",
+  "version": "1.0.0",
+  "description": "Cloud-based AI Video Generation Platform with 13-Agent Quality Control",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "keywords": ["ai-video", "fastapi", "13-agents", "map-studio"],
+  "author": "CineCraft AI",
+  "license": "ISC"
+}

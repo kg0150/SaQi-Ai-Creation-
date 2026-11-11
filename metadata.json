@@ -1,0 +1,6 @@
+{
+  "name": "CineCraft AI",
+  "description": "Cloud-based AI video generation platform with 13-agent QA pipeline, cinematic map studio, and multilingual voiceover engine",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
