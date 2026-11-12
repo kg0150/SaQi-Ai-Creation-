@@ -3,6 +3,6 @@
     <item
         android:width="66dp"
         android:height="66dp"
-        android:drawable="@drawable/cinecraft_logo_1793987333468"
+        android:drawable="@drawable/omniplay_logo_1794470787865"
         android:gravity="center" />
 </layer-list>

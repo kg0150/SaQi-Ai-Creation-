@@ -1,7 +1,6 @@
 package com.example.ui.theme
 
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -12,51 +11,51 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = CineGoldPrimary,
-    onPrimary = CineObsidian,
-    primaryContainer = CineSurfaceElevated,
-    onPrimaryContainer = CineGoldSecondary,
-    secondary = CineCyan,
-    onSecondary = CineObsidian,
-    secondaryContainer = CineSurfaceCard,
-    onSecondaryContainer = CineCyan,
-    tertiary = CineElectricViolet,
-    onTertiary = Color.White,
-    background = CineObsidian,
-    onBackground = CineTextPrimary,
-    surface = CineSurfaceDark,
-    onSurface = CineTextPrimary,
-    surfaceVariant = CineSurfaceCard,
-    onSurfaceVariant = CineTextSecondary,
-    outline = CineBorder,
-    error = CineNeonRose,
+    primary = OmniCyan,
+    onPrimary = OmniObsidian,
+    primaryContainer = OmniSurfaceElevated,
+    onPrimaryContainer = OmniCyan,
+    secondary = OmniViolet,
+    onSecondary = Color.White,
+    secondaryContainer = OmniSurfaceCard,
+    onSecondaryContainer = OmniViolet,
+    tertiary = OmniEmerald,
+    onTertiary = OmniObsidian,
+    background = OmniObsidian,
+    onBackground = OmniTextPrimary,
+    surface = OmniSurfaceDark,
+    onSurface = OmniTextPrimary,
+    surfaceVariant = OmniSurfaceCard,
+    onSurfaceVariant = OmniTextSecondary,
+    outline = OmniBorder,
+    error = OmniRose,
     onError = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = CineLightPrimary,
+    primary = OmniLightPrimary,
     onPrimary = Color.White,
-    primaryContainer = CineLightSurfaceElevated,
-    onPrimaryContainer = CineLightPrimary,
-    secondary = CineCyan,
+    primaryContainer = OmniLightSurfaceElevated,
+    onPrimaryContainer = OmniLightPrimary,
+    secondary = OmniViolet,
     onSecondary = Color.White,
-    tertiary = CineGoldDark,
+    tertiary = OmniEmerald,
     onTertiary = Color.White,
-    background = CineLightBg,
+    background = OmniLightBg,
     onBackground = Color(0xFF0F172A),
-    surface = CineLightSurface,
+    surface = OmniLightSurface,
     onSurface = Color(0xFF0F172A),
-    surfaceVariant = CineLightSurfaceElevated,
+    surfaceVariant = OmniLightSurfaceElevated,
     onSurfaceVariant = Color(0xFF475569),
-    outline = CineLightBorder,
-    error = CineNeonRose,
+    outline = OmniLightBorder,
+    error = OmniRose,
     onError = Color.White
 )
 
 @Composable
-fun CineCraftTheme(
-    darkTheme: Boolean = true, // Default to dark cinema aesthetic
-    dynamicColor: Boolean = false, // Keep signature cinematic styling consistent
+fun OmniPlayTheme(
+    darkTheme: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
@@ -74,3 +73,11 @@ fun CineCraftTheme(
         content = content
     )
 }
+
+// Backward compatibility alias
+@Composable
+fun CineCraftTheme(
+    darkTheme: Boolean = true,
+    dynamicColor: Boolean = false,
+    content: @Composable () -> Unit,
+) = OmniPlayTheme(darkTheme, dynamicColor, content)

@@ -13,7 +13,7 @@ android {
   compileSdk { version = release(36) { minorApiLevel = 1 } }
 
   defaultConfig {
-    applicationId = "com.aistudio.videogen.rqpkwe"
+    applicationId = "com.aistudio.omniplay.nvqxpk"
     minSdk = 24
     targetSdk = 36
     versionCode = 1

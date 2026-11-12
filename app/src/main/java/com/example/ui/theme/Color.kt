@@ -2,30 +2,26 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Cinematic Obsidian & Golden Neon Palette
-val CineObsidian = Color(0xFF090D16)
-val CineSurfaceDark = Color(0xFF111726)
-val CineSurfaceElevated = Color(0xFF1A2236)
-val CineSurfaceCard = Color(0xFF1E283F)
-val CineBorder = Color(0xFF2C3955)
+// OmniPlay Premium Futuristic Dark & Neon Palette
+val OmniObsidian = Color(0xFF070B14)
+val OmniSurfaceDark = Color(0xFF0F1626)
+val OmniSurfaceElevated = Color(0xFF152037)
+val OmniSurfaceCard = Color(0xFF1B2844)
+val OmniBorder = Color(0xFF24365C)
 
-val CineGoldPrimary = Color(0xFFF6AD55)
-val CineGoldSecondary = Color(0xFFECC94B)
-val CineGoldDark = Color(0xFFD69E2E)
+val OmniCyan = Color(0xFF00F0FF)
+val OmniViolet = Color(0xFF8B5CF6)
+val OmniEmerald = Color(0xFF10B981)
+val OmniAmber = Color(0xFFF59E0B)
+val OmniRose = Color(0xFFEF4444)
 
-val CineElectricViolet = Color(0xFF818CF8)
-val CineCyan = Color(0xFF38BDF8)
-val CineNeonEmerald = Color(0xFF34D399)
-val CineNeonRose = Color(0xFFF43F5E)
-val CineAmberAlert = Color(0xFFF59E0B)
+val OmniTextPrimary = Color(0xFFF8FAFC)
+val OmniTextSecondary = Color(0xFF94A3B8)
+val OmniTextMuted = Color(0xFF64748B)
 
-val CineTextPrimary = Color(0xFFF8FAFC)
-val CineTextSecondary = Color(0xFF94A3B8)
-val CineTextMuted = Color(0xFF64748B)
-
-// Light Theme Variants
-val CineLightBg = Color(0xFFF8FAFC)
-val CineLightSurface = Color(0xFFFFFFFF)
-val CineLightSurfaceElevated = Color(0xFFF1F5F9)
-val CineLightBorder = Color(0xFFCBD5E1)
-val CineLightPrimary = Color(0xFF4F46E5)
+// Light Theme
+val OmniLightBg = Color(0xFFF8FAFC)
+val OmniLightSurface = Color(0xFFFFFFFF)
+val OmniLightSurfaceElevated = Color(0xFFF1F5F9)
+val OmniLightBorder = Color(0xFFCBD5E1)
+val OmniLightPrimary = Color(0xFF0284C7)

@@ -1,6 +1,6 @@
 {
-  "name": "CineCraft AI",
-  "description": "Cloud-based AI video generation platform with 13-agent QA pipeline, cinematic map studio, and multilingual voiceover engine",
+  "name": "OmniPlay AI",
+  "description": "Next-generation all-in-one multimedia super app featuring an advanced video downloader, professional music and video players, AI media studio, and live advertising management network.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

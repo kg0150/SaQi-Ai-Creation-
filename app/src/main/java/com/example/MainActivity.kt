@@ -7,21 +7,21 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import com.example.ui.CineCraftApp
-import com.example.ui.theme.CineCraftTheme
+import com.example.ui.OmniPlayApp
+import com.example.ui.theme.OmniObsidian
+import com.example.ui.theme.OmniPlayTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            CineCraftTheme {
+            OmniPlayTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color(0xFF090D16)
+                    color = OmniObsidian
                 ) {
-                    CineCraftApp()
+                    OmniPlayApp()
                 }
             }
         }

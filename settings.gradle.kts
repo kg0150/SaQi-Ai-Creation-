@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "CineCraft"
+rootProject.name = "OmniPlay"
 
 include(":app")
