@@ -25,10 +25,9 @@ jobs:
           java-version: '17'
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Make Gradle executable
-        run: chmod +x ./gradlew
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
       - name: Build Debug APK
         run: ./gradlew --no-daemon :app:assembleDebug
